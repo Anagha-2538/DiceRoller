@@ -1,5 +1,6 @@
 package com.example.dicerollerapp
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.dicerollerapp.ui.theme.DiceRollerAppTheme
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.draw.rotate
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +53,14 @@ fun DiceWithButtonAndImage(
     modifier: Modifier = Modifier
 ) {
     var result by remember { mutableStateOf(1) }
-    val imageResource = when (result){
+    var rotation by remember { mutableStateOf(0f) }
+
+    val animatedRotation by animateFloatAsState(
+        targetValue = rotation,
+        label = ""
+    )
+
+    val imageResource = when (result) {
         1 -> R.drawable.dice_1
         2 -> R.drawable.dice_2
         3 -> R.drawable.dice_3
@@ -58,6 +68,7 @@ fun DiceWithButtonAndImage(
         5 -> R.drawable.dice_5
         else -> R.drawable.dice_6
     }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -67,13 +78,22 @@ fun DiceWithButtonAndImage(
 
         Image(
             painter = painterResource(imageResource),
-            contentDescription = result.toString()
+            contentDescription = result.toString(),
+            modifier = Modifier
+                .height(200.dp)
+                .rotate(animatedRotation)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { result = (1..6).random() }) {
-            Text(stringResource(R.string.roll))
+        Button(
+            onClick = {
+                result = (1..6).random()
+                rotation += 360f
+            },
+            modifier = Modifier.padding(top = 24.dp)
+        ) {
+            Text(text = stringResource(R.string.roll))
         }
     }
 }
